@@ -4,13 +4,20 @@ This repository contains the official Python implementation and dataset pipeline
 
 > **Classification with Mixed-Type Predictors and Doubly Adaptive Group-Fused Regularisation**  
 > **Author:** Sitong Zhang  
-> **Affiliation:** Department of Mathematics, University of Edinburgh  
+> **Affiliation:** School of Informatics, University of Edinburgh  
+
+---
+
+## Path Configuration Notice
+
+> **IMPORTANT BEFORE RUNNING:**  
+> Before executing any scripts, please inspect the file path variables (e.g., `data_path`, `output_dir`, or file path strings in script headers) across the Python scripts in both `Simulation_Comparision/` and `Application/` and update them to match your local directory paths.
 
 ---
 
 ## Requirements & Environment
 
-- **Python Version:** Python 3.8 or higher
+- **Python Version:** Python 3.9 or higher
 - **Dependencies:**
   - `numpy` — Numerical computations and vector/matrix operations
   - `pandas` — Data manipulation and dataset aggregation
@@ -42,10 +49,10 @@ The repository is structured into two main working directories corresponding to 
 │
 └── Application/                     # Section 5: MotionSense Real Data Application
     ├── Data/                        # Data processing & feature integration
-    │   ├── A_DeviceMotion_data/     # Raw sensor trajectory recordings
-    │   ├── data_subjects_info.csv   # Subject demographic metadata
     │   ├── main 01.41.58.py         # Automated data merging script
-    │   └── combined_devices_data.csv# Generated merged dataset
+    │   ├── A_DeviceMotion_data/     # [External] Downloaded from MotionSense repository
+    │   ├── data_subjects_info.csv   # [External] Downloaded from MotionSense repository
+    │   └── combined_devices_data.csv# [Generated] Output from running main 01.41.58.py
     └── Experiment/                  # Preprocessing & model fitting
         ├── motionsense_preprocess.py# MotionSense preprocessing & windowing pipeline
         ├── Adaptive Lasso.py        # Adaptive Lasso framework
@@ -90,14 +97,30 @@ To reproduce the synthetic evaluation results reported in Section 4:
 
 To reproduce the real-world wearable sensor human activity recognition (HAR) evaluation reported in Section 5:
 
-1. Navigate to the `Application/Data` subfolder and execute the data merging script:
+#### Step 1: Download Raw Dataset
+Due to file size constraints, raw dataset files are not tracked in this GitHub repository. Please fetch the official MotionSense dataset from its source repository:
+
+1. Clone or download the MotionSense repository from GitHub:
+   ```bash
+   git clone https://github.com/mmalekzadeh/motion-sense.git
+   ```
+2. Copy the folder `A_DeviceMotion_data/` and the metadata file `data_subjects_info.csv` into the `Application/Data/` directory of this repository:
+   ```text
+   Application/Data/
+   ├── A_DeviceMotion_data/
+   ├── data_subjects_info.csv
+   └── main 01.41.58.py
+   ```
+
+#### Step 2: Data Merging & Preprocessing
+1. Navigate to `Application/Data` and execute the data merging script:
    ```bash
    cd Application/Data
    python "main 01.41.58.py"
    ```
-   *This merges `A_DeviceMotion_data/` and `data_subjects_info.csv` into `combined_devices_data.csv`.*
+   *This script merges `A_DeviceMotion_data/` and `data_subjects_info.csv` to generate `combined_devices_data.csv`.*
 
-2. Navigate to the `Application/Experiment` subfolder:
+2. Navigate to `Application/Experiment`:
    ```bash
    cd ../Experiment
    ```
@@ -107,11 +130,12 @@ To reproduce the real-world wearable sensor human activity recognition (HAR) eva
    python motionsense_preprocess.py
    ```
 
-4. Run model evaluations sequentially to generate class predictions and parameter compression results:
-   ```bash
-   python "Adaptive Lasso.py"
-   python Kernel.py
-   python Spline.py
-   python DAGFR.py
-   ```
-   Each script outputs its fitted parameters, test classification performance, and feature compression statistics corresponding to the MotionSense empirical benchmark in Section 5.
+#### Step 3: Model Fitting & Evaluation
+Run model evaluations sequentially to compute performance metrics and parameter compression statistics:
+```bash
+python "Adaptive Lasso.py"
+python Kernel.py
+python Spline.py
+python DAGFR.py
+```
+*Each script outputs its fitted parameters, test classification performance, and feature compression statistics corresponding to the MotionSense empirical benchmark in Section 5.*
